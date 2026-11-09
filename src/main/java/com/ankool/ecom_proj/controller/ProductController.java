@@ -1,4 +1,7 @@
 package com.ankool.ecom_proj.controller;
+import jakarta.servlet.http.HttpServletRequest;
+import org.jspecify.annotations.NonNull;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.transaction.annotation.Transactional;
 import com.ankool.ecom_proj.model.Product;
 import com.ankool.ecom_proj.service.ProductService;
@@ -19,8 +22,8 @@ public class ProductController {
     private ProductService service;
 
     @RequestMapping("/")
-    public String greet(){
-        return "Hello World";
+    public String greet(HttpServletRequest request) {
+        return "Doing Spring Security "+ request.getSession().getId();
     }
 
     @GetMapping("/products")
@@ -36,6 +39,12 @@ public class ProductController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
+    }
+
+
+    @GetMapping("/csrftoken")
+    public CsrfToken getToken(@NonNull HttpServletRequest request){
+        return (CsrfToken) request.getAttribute("_csrf");
     }
 
     @PostMapping("/add")
