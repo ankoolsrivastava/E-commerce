@@ -3,6 +3,7 @@ package com.ankool.ecom_proj.service;
 import com.ankool.ecom_proj.model.Product;
 import com.ankool.ecom_proj.repo.ProductRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,22 +14,23 @@ import java.util.List;
 public class ProductService {
     @Autowired
     private ProductRepo repo;
-
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public List<Product> getAllProduct() {
         return repo.findAll();
     }
 
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public Product getProduct(int id) {
         return repo.findById(id).orElse(null);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     public Product addProduct(Product product, MultipartFile imageFile) throws IOException {
         product.setImageName(imageFile.getOriginalFilename());
         product.setImageType(imageFile.getContentType());
         product.setImageData(imageFile.getBytes());
         return repo.save(product);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     public Product updateProduct(int id, Product product, MultipartFile imageFile) throws IOException {
         if (imageFile != null && !imageFile.isEmpty()) {
             product.setImageData(imageFile.getBytes());
@@ -46,11 +48,12 @@ public class ProductService {
             product.setId(id);
             return repo.save(product);
         }
-
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteProduct(int id) {
         repo.deleteById(id);
     }
 
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public List<Product> searchProduct(String keyword) {
         return repo.searchProducts(keyword);
     }
